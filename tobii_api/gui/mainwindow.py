@@ -106,6 +106,7 @@ class MainWindow(MainWindowBase, MainWindowUI):
         self.footer.setLayout(layout)
 
         self.bar_index = QScrollBar(Qt.Horizontal)
+        self.bar_index.setFocusPolicy(Qt.WheelFocus)
         self.bar_index.setMinimum(0)
         self.bar_index.setSingleStep(1)
         self.bar_index.valueChanged.connect(self.indexChanged)
