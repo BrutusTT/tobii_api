@@ -3,17 +3,13 @@ from os.path            import abspath, join, dirname
 
 from PyQt5              import uic
 from PyQt5.QtCore       import Qt
-from PyQt5.QtWidgets    import QApplication, QHBoxLayout, QShortcut, QScrollBar, QVBoxLayout, QLabel, QTextEdit,\
-    QPushButton
+from PyQt5.QtWidgets    import QApplication, QHBoxLayout, QShortcut, QScrollBar, QVBoxLayout, QLabel
 from PyQt5.QtGui        import QKeySequence
 
 from pyqode.python.widgets      import PyCodeEdit
 
 from tobii_api.manager          import Manager
 from tobii_api.gui.VideoWidget  import VideoWidget
-
-import cv2
-import numpy as np
 
 
 tmp_code= """
@@ -170,32 +166,6 @@ def main():
     m = Manager(op.expanduser('~/software/datasets/cls/Tobii'))
     s = m.getProject('ijkrmxv').getRecording('pzb2ix5').segments_data[0]
     s.loadData()
-    pd_left         = s.pd_left_timeline()
-    pd_right        = s.pd_right_timeline()
-    pd_left_stats   = s.pd_left_stats()
-    pd_right_stats  = s.pd_right_stats()
-
-    print (len(pd_left), len(pd_right))
-
-    print ((pd_left[-1][0] - pd_left[0][0]) / 1000000)
-    print (pd_left_stats)
-    print (pd_right_stats)
-    
-    count = 0
-    threshold = pd_left_stats[0] + ((pd_left_stats[1] - pd_left_stats[0]) * 0.7)
-#     threshold = pd_left_stats[1] * 0.7
-    for x in pd_left:
-        if x[1] > threshold:
-            count +=1
-    print (threshold, count)
-    
-    count = 0
-    threshold = pd_right_stats[0] + ((pd_right_stats[1] - pd_right_stats[0]) * 0.7)
-#     threshold = pd_right_stats[1] * 0.7
-    for x in pd_right:
-        if x[1] > threshold:
-            count +=1
-    print (threshold, count)
 
     # start app
     app = QApplication(sys.argv)
@@ -208,11 +178,7 @@ def main():
     mw.indexChanged(0)
     mw.show()
 
-
-    print ( (mw.contentWidget.length / mw.contentWidget.fps) )
-
     sys.exit(app.exec_())
-
 
 if __name__ == "__main__":
     main()
