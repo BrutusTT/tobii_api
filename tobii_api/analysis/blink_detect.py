@@ -13,6 +13,7 @@ def test(img):
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray, (3, 3), 0)
+    #tight Canny Edge Detection
     edges = cv2.Canny(blurred, 225, 250)
 
     _, contours, hierarchy = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
