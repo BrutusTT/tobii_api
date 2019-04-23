@@ -3,26 +3,20 @@ import os.path as op
 #from tobii_api.manager import Manager
 
 import cv2
+import numpy as np
 
 
-def f(img):
-    #img = img[100:240, 100:240,:]
-    img = img[100:200, 100:160,:]
-    #cv2.imshow("",img)
+def test(img):
+    img = img[100:200, 100:160, :]
+    # cv2.imshow("",img)
     image = img.copy()
 
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (3, 3), 0)
+    #tight Canny Edge Detection
+    edges = cv2.Canny(blurred, 225, 250)
 
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    img = cv2.bitwise_not(img)
-    img = cv2.GaussianBlur(img, (5, 5), 0)
-    _, img = cv2.threshold(img, 220, 255, cv2.THRESH_TOZERO)
-    _, img = cv2.threshold(img, 220, 255, cv2.THRESH_BINARY)
-    img = cv2.bitwise_not(img)
-
-    _,contours, hierarchy = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-
-
+    _, contours, hierarchy = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # create hull array for convex hull points
     hull = []
@@ -32,35 +26,15 @@ def f(img):
         # creating convex hull object for each contour
         hull.append(cv2.convexHull(contours[i], False))
 
+    # sort the hull based on the diameter
     hull = sorted(hull, key=lambda x: cv2.contourArea(x))
     hull.reverse()
 
-    img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+    if len(hull) < 3:
+        return 0
+    else:
+        return 1
 
-    #for i in range(len(hull)):
-
-    hull = hull[:2]
-
-    # compute the center of the contour
-    if hull:
-        try:
-            M = cv2.moments(hull[-1])
-            cX = int(M["m10"] / M["m00"])
-            cY = int(M["m01"] / M["m00"])
-
-            img = cv2.circle(img, (cX, cY), 1, (0, 255, 0), -1)
-
-            img = cv2.drawContours(img, hull, 1, (0, 0, 255), 1, 8)
-            #cv2.imshow("img", img)
-
-            return 1
-        except:
-
-            return 0
-            pass
-
-
-#    return image
 
 def blinkCount(a):
 
@@ -110,7 +84,7 @@ def main():
     #     s.showFront(0.5)
     list = []
     key = 0
-    camera = cv2.VideoCapture("eyesstream_10.mp4")
+    camera = cv2.VideoCapture("eyesstream.mp4")
 
     # camera = cv2.VideoCapture(0)
     ret, frame = camera.read()
@@ -121,7 +95,7 @@ def main():
         time = gettime(camera.get(cv2.CAP_PROP_POS_MSEC))
 
         if ret:
-            value = f(frame)
+            value = test(frame)
             list.append(str(value)+"-"+time)
             #cv2.imshow('blinks counter', frame)
             key = cv2.waitKey(1) & 0xFF
