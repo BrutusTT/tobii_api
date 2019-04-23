@@ -38,7 +38,7 @@ _STR = """{
     "seg_eyesstream":  %s
 }"""
 
-class Segment:
+class Segment(object):
     
     
     
@@ -65,6 +65,7 @@ class Segment:
     def front_video_file(self):
         return op.join(self.path, 'fullstream.mp4')
 
+
     @property
     def eyes_video_file(self):
         return op.join(self.path, 'eyesstream.mp4')
@@ -73,6 +74,7 @@ class Segment:
     def _importInfo(self):
         with open(op.join(self.path, 'segment.json')) as f:
             data = json.load(f)
+
             # remove the seq_ prefix
             for name in data:
                 setattr(self, name[4:], data[name])
@@ -84,7 +86,6 @@ class Segment:
     def loadData(self):
         with gzip.open(op.join(self.path, 'livedata.json.gz'), 'r') as f:
             self.data = [json.loads('[%s]' % l)[0] for l in str(f.read().decode('utf-8')).split('\n') if l]
-            print (len(self.data))
 
 
     def showFront(self, scale = 1.0):
@@ -122,13 +123,14 @@ class Segment:
 
 
     def show(self, scale = 1.0):
-        cap  = cv2.VideoCapture(op.join(self.path, 'fullstream.mp4'))
-        cap2 = cv2.VideoCapture(op.join(self.path, 'eyesstream.mp4'))
+        cap  = cv2.VideoCapture(self.front_video_file)
+        cap2 = cv2.VideoCapture(self.eyes_video_file)
 
         while cap.isOpened() and cap2.isOpened():
 
             # Capture frame-by-frame
             _, frame1 = cap.read()
+            _, frame2 = cap2.read()
             _, frame2 = cap2.read()
 
             frame1 = cv2.resize(frame1, (int(frame1.shape[1] * scale), int(frame1.shape[0] * scale)))

@@ -2,8 +2,7 @@ import os.path as op
 
 import cv2
 
-from PyQt5.QtCore    import Qt, pyqtSignal
-from PyQt5.QtWidgets import QLabel, QFrame, QHBoxLayout, QVBoxLayout, QScrollBar
+from PyQt5.QtWidgets import QLabel
 from PyQt5.QtGui     import QImage, QPixmap
 
 
@@ -16,7 +15,7 @@ class VideoWidget(QLabel):
 
         # check if it is a file
         if not op.isfile(path):
-            raise RuntimeError('%s is not a video file' % path)
+            raise ValueError('%s is not a video file' % path)
 
         # open the video file
         self.video = cv2.VideoCapture(path)

@@ -5,7 +5,7 @@ import json
 from segment import Segment
 
 
-class Recording:
+class Recording(object):
 
 
 # {
@@ -94,4 +94,11 @@ class Recording:
         for uid in range(self.segments):
             self.segments_data.append(Segment(op.join(self.path, 'segments', str(uid+1))))
         
+
+    def getSegment(self, uid):
+        return self.segments_data[int(uid) - 1]
         
+        
+    def getSegmentIDs(self):
+        return [ '%d' % (uid + 1) for uid in range(self.segments)]
+

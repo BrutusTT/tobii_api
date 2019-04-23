@@ -15,7 +15,7 @@ class Manager:
         # check that we are in the right place
         marker_file = op.join(self.path, 'projects.ttgp')
         if not op.exists(marker_file):
-            raise RuntimeError('The given path [%s] is not a root for a Tobii filestructure' % self.root)
+            raise ValueError('The given path [%s] is not a root for a Tobii filestructure' % self.root)
 
 
     def getProjectNames(self):
@@ -26,3 +26,6 @@ class Manager:
     def getProject(self, name):
         return Project(op.join(self.projects_path, name))
 
+
+    def __len__(self):
+        return len(self.getProjectNames())
