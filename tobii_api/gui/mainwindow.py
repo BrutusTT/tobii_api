@@ -90,10 +90,15 @@ MainWindowUI, MainWindowBase = uic.loadUiType( join(path, 'mainwindow.ui') )
 class MainWindow(MainWindowBase, MainWindowUI):
 
 
+    VIDEOS = ('front_video_file', 'eyes_video_file')
+
+
     def __init__(self, manager, parent = None):
         MainWindowBase.__init__(self, parent)
 
-        self.manager = manager
+        self.manager            = manager
+        self.current_segment    = None
+        self.current_video      = 0
 
         self.setupUi(self)
         self.setupConnections()
@@ -175,6 +180,13 @@ class MainWindow(MainWindowBase, MainWindowUI):
 
         self.treeView.doubleClicked.connect(self.navigation_doubleClicked)
 
+        self.pb_video_toggle.clicked.connect(self.toggleVideo)
+
+
+    def toggleVideo(self):
+        self.current_video = (self.current_video + 1) % len(MainWindow.VIDEOS)
+        self.setSegment(self.current_segment)
+
 
     def navigation_doubleClicked(self, _):        
         item = self.treeView.selectedIndexes()[0]
@@ -223,7 +235,8 @@ class MainWindow(MainWindowBase, MainWindowUI):
 
 
     def setSegment(self, segment):
-        self.setVideo(segment.eyes_video_file)
+        self.current_segment = segment
+        self.setVideo(getattr(self.current_segment, MainWindow.VIDEOS[self.current_video]))
         self.bar_index.setValue(0)
         self.indexChanged(0)
 
