@@ -99,6 +99,7 @@ class MainWindow(MainWindowBase, MainWindowUI):
         self.manager            = manager
         self.current_segment    = None
         self.current_video      = 0
+        self.nav_hide_empty     = True
 
         self.setupUi(self)
         self.setupConnections()
@@ -136,33 +137,9 @@ class MainWindow(MainWindowBase, MainWindowUI):
         self.info = QLabel()
         layout.addWidget(self.info)
 
-
         # construct navigation tree
-        items = []
-        for project_id in self.manager.getProjectNames():
-            project           = self.manager.getProject(project_id)
-            p_node            = NavigationNode(project.info['Name'])
-            p_node.obj_data   = project
-            items.append(p_node)
-
-            for r_id in sorted(p_node.obj_data.getRecordingNames()):
-                recording       = p_node.obj_data.getRecording(r_id)
-
-                if recording:
-                    r_node          = NavigationNode(r_id)
-                    r_node.obj_data = recording
- 
-                    p_node.addChild(r_node)
-                    for segment_id in r_node.obj_data.getSegmentIDs():
-                        s_node          = NavigationNode(segment_id)
-                        s_node.obj_data = r_node.obj_data.getSegment(segment_id)
-                        r_node.addChild(s_node)
-                
+        self.refreshNavigation()
          
-        self.treeView.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.treeView.setUniformRowHeights(True)
-        self.treeView.setModel(NavigationModel(items))
-
         # design the view
         self.treeView.header().hide()                    # hide header
         self.treeView.expandToDepth(0)                   # expand first level
@@ -181,11 +158,45 @@ class MainWindow(MainWindowBase, MainWindowUI):
         self.treeView.doubleClicked.connect(self.navigation_doubleClicked)
 
         self.pb_video_toggle.clicked.connect(self.toggleVideo)
+        self.pb_hide_toggle.clicked.connect(self.toggleHideEmpty)
 
 
     def toggleVideo(self):
         self.current_video = (self.current_video + 1) % len(MainWindow.VIDEOS)
         self.setSegment(self.current_segment)
+
+
+    def toggleHideEmpty(self):
+        self.nav_hide_empty = not self.nav_hide_empty
+        self.refreshNavigation()
+
+
+    def refreshNavigation(self):
+        items = []
+        for project_id in self.manager.getProjectNames():
+            project           = self.manager.getProject(project_id)
+            p_node            = NavigationNode(project.info['Name'])
+            p_node.obj_data   = project
+            items.append(p_node)
+
+            for r_id in sorted(p_node.obj_data.getRecordingNames()):
+                print (r_id)
+                recording       = p_node.obj_data.getRecording(r_id)
+                print (recording)
+
+                if recording:
+                    r_node          = NavigationNode(r_id)
+                    r_node.obj_data = recording
+ 
+                    p_node.addChild(r_node)
+                    for segment_id in r_node.obj_data.getSegmentIDs():
+                        s_node          = NavigationNode(segment_id)
+                        s_node.obj_data = r_node.obj_data.getSegment(segment_id)
+                        r_node.addChild(s_node)
+
+        self.treeView.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.treeView.setUniformRowHeights(True)
+        self.treeView.setModel(NavigationModel(items))
 
 
     def navigation_doubleClicked(self, _):        
@@ -219,13 +230,14 @@ class MainWindow(MainWindowBase, MainWindowUI):
 
     def setVideo(self, path):
         self.contentWidget.openVideo(path)
-        self.bar_index.setMaximum(self.contentWidget.length)
+        self.bar_index.setMaximum(self.contentWidget.video.length)
 
 
     def indexChanged(self, value):
         self.applyCode()
-        video           = self.contentWidget
+        video           = self.contentWidget.video
         video.pos_frame = value
+        self.contentWidget.updateImage()
 
         info_msg = []
         info_msg.append('FPS:   %s'             % video.fps)
