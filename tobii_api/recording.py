@@ -2,7 +2,10 @@ import os.path as op
 
 import json
 
-from segment import Segment
+from tobii_api.segment import Segment
+
+import logging
+LOG = logging.getLogger(__name__)
 
 
 class Recording(object):
@@ -83,8 +86,12 @@ class Recording(object):
 
         if self.segments > 0:
 
-            with open(op.join(self.path, 'participant.json')) as f:
-                self.data_par = json.load(f)
+            p_json = op.join(self.path, 'participant.json')
+            if op.isfile(p_json):
+                with open(p_json) as f:
+                    self.data_par = json.load(f)
+            else:
+                LOG.warning(p_json + ' file not found. Continuing without participant information.')
     
             with open(op.join(self.path, 'sysinfo.json')) as f:
                 self.data_sys = json.load(f)

@@ -2,7 +2,7 @@ import os
 import os.path as op
 
 
-from project import Project
+from tobii_api.project import Project
 
 
 class Manager:

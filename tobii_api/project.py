@@ -3,7 +3,7 @@ import os.path as op
 
 import json
 
-from recording import Recording
+from tobii_api.recording import Recording
 
 
 class Project:
@@ -58,7 +58,8 @@ class Project:
 
 
     def getRecording(self, name):
-        try:
-            return Recording(op.join(self.path_rec, name))
-        except:
+        filepath = op.join(self.path_rec, name)
+        if not op.isdir(filepath):
             return None
+
+        return Recording(op.join(self.path_rec, name))
