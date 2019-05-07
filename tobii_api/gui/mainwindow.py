@@ -247,10 +247,13 @@ class MainWindow(MainWindowBase, MainWindowUI):
 
 
     def setSegment(self, segment):
-        self.current_segment = segment
-        self.setVideo(getattr(self.current_segment, MainWindow.VIDEOS[self.current_video]))
-        self.bar_index.setValue(0)
-        self.indexChanged(0)
+        try:
+            self.current_segment = segment
+            self.setVideo(getattr(self.current_segment, MainWindow.VIDEOS[self.current_video]))
+            self.bar_index.setValue(0)
+            self.indexChanged(0)
+        except:
+            pass
 
 
 ####################################################################################################
@@ -262,7 +265,6 @@ def main():
     # get the segment
     m = Manager(op.expanduser('~/software/datasets/cls/Tobii'))
     s = m.getProject('ijkrmxv').getRecording('dyswx3p').getSegment('1')
-    s.loadData()
 
     # start app
     app = QApplication(sys.argv)
