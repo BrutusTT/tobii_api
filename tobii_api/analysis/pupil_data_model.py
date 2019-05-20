@@ -16,10 +16,6 @@ def madCalc(d, n):
 class PupilDataModel:
     
 
-    CSV_FILE_NAME   = 'pd_table.csv'
-    CSV_L_FILE_NAME = 'pd_timeseries_left.csv'
-    CSV_R_FILE_NAME = 'pd_timeseries_right.csv'
-
     # Default values according to Kret et al. 2018 and corresponding source code
     # see https://github.com/ElioS-S/pupil-size/blob/master/code/helperFunctions/rawDataFilter.m
     
