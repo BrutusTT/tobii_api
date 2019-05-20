@@ -129,6 +129,28 @@ class PupilDataModel:
         return self._ts_r_filtered, self._pd_r_filtered
 
 
+    @property
+    def blinks(self):
+        ts, _   = self.eye_left_filtered
+        dts     = np.diff(ts)
+        blink_l = np.argwhere( (dts > self.BLINK_MIN) & (dts < self.BLINK_MAX)) .flatten()
+        ts_l    = (np.array([ts[idx] for idx in blink_l]) - self.ts[0]) / 1000.0
+#         print (ts_l)
+
+        ts, _   = self.eye_right_filtered
+        dts     = np.diff(ts)
+        blink_r = np.argwhere( (dts > self.BLINK_MIN) & (dts < self.BLINK_MAX)) .flatten()
+        ts_r    = (np.array([ts[idx] for idx in blink_r]) - self.ts[0]) / 1000.0
+#         print (ts_r)
+        count   = 0
+        for t_l in ts_l:
+            for t_r in ts_r:
+                if abs(t_l - t_r) < 50.0: 
+                    count += 1
+
+        return count
+
+
     def _filter(self, ts, pd):
         ts, pd = self.filterRange(ts, pd)
         ts, pd = self.filterLoners(ts, pd)
