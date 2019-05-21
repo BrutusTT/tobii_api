@@ -234,7 +234,7 @@ class Segment(object):
 
         # first pass, merge ts entries
         for entry in self.livedata:
-            ts = round(int(entry['ts']) / 1000.0)
+            ts = int(entry['ts'])
 
             if 'pd' in entry:
 
@@ -308,9 +308,9 @@ class Segment(object):
             return self._pd_table
         
         # load if exists not loaded
-        if op.exists(op.join(self.path, 'pd_table.csv')):
-            self._loadPupilDilationTable()
-            return self._pd_table
+#         if op.exists(op.join(self.path, 'pd_table.csv')):
+#             self._loadPupilDilationTable()
+#             return self._pd_table
 
         # otherwise generate and return     
         self._savePupilDilationTable()
